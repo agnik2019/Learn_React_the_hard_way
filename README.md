@@ -1,70 +1,121 @@
-# Getting Started with Create React App
+# Getting Started with React
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+I am learning React. Here are my notes.
 
-## Available Scripts
+```javascript
 
-In the project directory, you can run:
+  //state
+  const [colorTheme, setColorTheme] = useState('theme-white');
 
-### `npm start`
+  //effect
+  useEffect(() => {
+    const currentThemeColor = localStorage.getItem('theme-color');
+    if(currentThemeColor){
+      setColorTheme(currentThemeColor);
+    }
+  },[]);
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+```
+In that example, we are seeing that usestate is used for storing and updating the state of a component.
+useState is a Hook that allows you to have state variables in functional components. You pass the initial state to this function and it returns a variable with the current state value (not necessarily the initial state) and another function to update this value.
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+ **useEffect() — the hook that manages side-effects in functional React components.**
+```javascript
+ function Greet({ name }) {
+  const message = `Hello, ${name}!`; // Calculates output
 
-### `npm test`
+  // Bad!
+  document.title = 'Greetings page'; // Side-effect!
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+  return <div>{message}</div>;       // Calculates output
+}
+```
+How to decouple rendering from the side-effect? Welcome useEffect() — the hook that runs side-effects independently of rendering.
+```javascript
+import { useEffect } from 'react';
 
-### `npm run build`
+function Greet({ name }) {
+  const message = `Hello, ${name}!`;   // Calculates output
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+  useEffect(() => {
+    // Good!
+    document.title = 'Greetings page'; // Side-effect!
+  }, []);
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+  return <div>{message}</div>;         // Calculates output
+}
+```
+### useEffect() hook accepts 2 arguments:
+```javascript
+useEffect(callback[, dependencies]);
+```
+- callback is the callback function containing side-effect logic. useEffect() executes the callback function after React has committed the changes to the screen.
+- dependencies is an optional array of dependencies. useEffect() executes callback only if the dependencies have changed between renderings.
+Put your side-effect logic into the callback function, then use the dependencies argument to control when you want the side-effect to run. That’s the sole purpose of useEffect().
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## The dependencies of useEffect()
+dependencies argument of useEffect(callback, dependencies) lets you control when the side-effect runs. When dependencies are:
 
-### `npm run eject`
+**A) Not provided: the side-effect runs after every rendering.**
+```javascript
+import { useEffect } from 'react';
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+function MyComponent() {
+  useEffect(() => {
+    // Runs after EVERY rendering
+  });  
+}
+```
+**B) An empty array []: the side-effect runs once after the initial rendering.**
+```javascript
+import { useEffect } from 'react';
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+function MyComponent() {
+  useEffect(() => {
+    // Runs ONCE after initial rendering
+  }, []);
+}
+```
+**C) Has props or state values [prop1, prop2, ..., state1, state2]: the side-effect runs only when any depenendecy value changes.**
+```javascript
+import { useEffect, useState } from 'react';
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+function MyComponent({ prop }) {
+  const [state, setState] = useState('');
+  useEffect(() => {
+    // Runs ONCE after initial rendering
+    // and after every rendering ONLY IF `prop` or `state` changes
+  }, [prop, state]);
+}
+```
+Let’s detail into the cases B) and C) since they’re used often.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## The side-effect on component did mount
+To invoke a side-effect once after the component mounting, use an empty dependencies array:
+```javascript
+import { useEffect } from 'react';
 
-## Learn More
+function Greet({ name }) {
+  const message = `Hello, ${name}!`;
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+  useEffect(() => {
+    // Runs once, after mounting
+    document.title = 'Greetings page';
+  }, []);
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+  return <div>{message}</div>;
+}
+```
+useEffect(..., []) was supplied with an empty array as a dependencies argument. When configured in such a way, the useEffect() is going to execute the callback just once, after initial mounting.
 
-### Code Splitting
+Even if the component re-renders with different name property, the side-effect runs only once after the first render:
+```javascript
+// First render
+<Greet name="Eric" />   // Side-effect RUNS
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+// Second render, name prop changes
+<Greet name="Stan" />   // Side-effect does NOT RUN
 
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+// Third render, name prop changes
+<Greet name="Butters"/> // Side-effect does NOT RUN
+```
