@@ -1,0 +1,115 @@
+*{
+    box-sizing: border-box;
+}
+
+.ThemeApp{
+    height: 100%;
+    font-family: 'Balsamiq Sans', cursive;
+    font-size:25px;
+}
+
+body{
+    background-color: #fff;
+    color:#222;
+    padding: 0;
+    height: 100vh;
+}
+
+.theme-options{
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: right;
+    padding: 20px 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    
+
+    div{
+        cursor:pointer;
+        width:40px;
+        height: 40px;
+        border-radius: 50%;
+        border : 1px solid black;
+        display: inline-block;
+        opacity: 0.5;
+
+        &.active{
+            opacity:1;
+        }
+    }
+
+
+#theme-white{
+    background-color: #eee;
+}
+
+#theme-blue{
+    background-color: #1e41c1;
+}
+
+#theme-orange{
+    background-color: #b64b1e;
+}
+
+
+}
+
+.content-box {
+    margin: 0 auto;
+    background-color: #eee;
+    color: #222;
+    border-radius: 8px;
+    padding: 30px 30px 40px 30px;
+    max-width: 800px;
+    h1{
+        line-height: 1.2;
+        margin: 0;
+        font-size: 26px;
+    }
+
+    h5{
+        line-height: 1.5;
+        margin: 0 0 22px 0;
+        font-size: 20px;
+    }
+}
+
+//theming
+.ThemeApp.theme-blue{
+    background-color: #bec7e7;
+    .content-box{
+        background-color: #d8def4;
+        h3,h5{
+            color:#1e41c1
+        }
+        p{
+            color:#000;
+        }
+    }
+}
+
+.ThemeApp.theme-orange{
+    background-color: #f4c9b7;
+    .content-box{
+        background-color: #f4dfd6;
+        h3,h5{
+            color:#b64b1e;
+        }
+        p{
+            color:#000;
+        }
+    }
+}
+.ThemeApp.theme-blue{
+    background-color: #bec7e7;
+    .content-box{
+        background-color: #d8def4;
+        h3,h5{
+            color:#1e41c1
+        }
+        p{
+            color:#000;
+        }
+    }
+}

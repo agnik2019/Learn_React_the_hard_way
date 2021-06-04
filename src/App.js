@@ -1,24 +1,22 @@
-import logo from './logo.svg';
 import './App.css';
+import SwitchTheme from './SwitchTheme';
+import TweetList from "./components/TweetList";
+import CreateTweet from "./components/CreateTweet";
+
 
 function App() {
+  const name = "Agnik";
+  const message= "React is awesome!!!!";
+
+  
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+   <div className="App">
+     <div className="main">
+     <SwitchTheme/>
+      <CreateTweet/>
+      <TweetList name={name} message={message}/>  
+      </div>
+   </div>
   );
 }
 
