@@ -119,3 +119,19 @@ Even if the component re-renders with different name property, the side-effect r
 // Third render, name prop changes
 <Greet name="Butters"/> // Side-effect does NOT RUN
 ```
+
+# UseRef hook
+
+UseState is used for rerendering the component whenever the value of the state changes. However, keep in mind that useRef doesn't notify you when its content changes. Mutating the .current property doesn't cause a re-render. If you want to run some code when React attachs or detaches a ref to a DOM node, you may want to use a callback ref instead.
+
+```javascript
+const refContainer = useRef(initialValue)
+```
+useRef returns a mutable ref object whose .current property is initialized to the passed argument(initialValue). The returned object will persist for the full lifetime of the component.
+
+reference.current accesses the reference value, and reference.current = newValue updates the reference value. Pretty simple.
+
+**There are 2 rules to remember about references:**
+
+1. The value of the reference is persisted (stays the same) between component re-renderings;
+2. Updating a reference doesn’t trigger a component re-rendering.
