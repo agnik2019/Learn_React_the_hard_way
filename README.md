@@ -135,3 +135,54 @@ reference.current accesses the reference value, and reference.current = newValue
 
 1. The value of the reference is persisted (stays the same) between component re-renderings;
 2. Updating a reference doesn’t trigger a component re-rendering.
+
+
+# useContext
+```javascript
+import React,{createContext} from 'react';
+import ReactDOM from 'react-dom';
+import App from './App';
+
+export const TreesContext = createContext();
+
+const trees = [
+  {id:"1", type:"Mapple"},
+  {id:"2", type:"Oak"},
+  {id:"3", type:"Apple"},
+  {id:"4", type:"Mango"},
+
+]
+
+ReactDOM.render(
+  <React.StrictMode>
+    <TreesContext.Provider value = {{trees}}>
+    <App />
+    </TreesContext.Provider>
+  </React.StrictMode>,
+  document.getElementById('root')
+);
+
+```
+
+```javascript
+import {TreesContext} from "./"
+
+function App() {
+
+  const {trees} = useContext(TreesContext);
+
+  return (
+   <div className="App">
+      <h1>Trees I have heard of </h1>
+      <ul>
+        {trees.map((tree) => (
+          <li key= {tree.id}>{tree.type}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default App;
+```
+
