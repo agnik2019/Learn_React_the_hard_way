@@ -119,7 +119,92 @@ Even if the component re-renders with different name property, the side-effect r
 // Third render, name prop changes
 <Greet name="Butters"/> // Side-effect does NOT RUN
 ```
+```javascript
+function Demo2() {
+    const [data, setData] = useState([]);
+    useEffect(()=>{
+        fetch(`http://api.github.com/users`)
+        .then((response) => response.json())
+        .then(setData)
+    },[]);
+    if(data){
+    return (
+        <div>
+            <ul>
+                {data.map((user)=> (
+                    <li key={user.id}>{user.login}</li>
+                ))}
+            </ul>
+            <button onClick={()=> setData([])}>Remove me</button>
+        </div>
+    );
+    }
+    return <p>No Users</p>
+}
+```
 
+# UseReducer hook
+```javascript
+function Demo3() {
+    const [checked, setChecked] = useState(false);
+    return (
+        <div>
+            <input
+            type="checkbox"
+            value = {checked}
+            onClick={()=> setChecked((checked)=> !checked)}/>
+           {checked ? "checked": "not Checked"}
+        </div>
+    )
+}
+```
+using useReducer hook 
+```javascript
+function Demo3() {
+    const [checked, toggle] = useReducer(
+        (checked)=> !checked,false);
+    return (
+        <div>
+            <input
+            type="checkbox"
+            value = {checked}
+            onClick={toggle}/>
+           {checked ? "checked": "not Checked"}
+        </div>
+    )
+}
+```
+```javascript
+import React,{useReducer} from 'react'
+const initialState = {
+    message:"hello"
+};
+function reducer(state, action)
+{
+    switch(action.type){
+        case "yell":
+            return {
+                message:`hey!! THE MESSAGE IS ${state.message}`
+            };
+        case "whisper":
+            return{
+                message:`Excuse me !!! The message is ${state.message}`
+            }
+    }
+}
+function Demo4() {
+    const [state, dispatch] = useReducer(reducer, initialState);
+    return (
+        <div>
+            <p>Message : {state.message}</p>
+            <button onClick={()=> dispatch({type:"yell"})}>Yell</button>
+            <button onClick={()=> dispatch({type:"whisper"})}>Whisper</button>
+
+        </div>
+    )
+}
+
+```
 # UseRef hook
 
 UseState is used for rerendering the component whenever the value of the state changes. However, keep in mind that useRef doesn't notify you when its content changes. Mutating the .current property doesn't cause a re-render. If you want to run some code when React attachs or detaches a ref to a DOM node, you may want to use a callback ref instead.
@@ -135,6 +220,37 @@ reference.current accesses the reference value, and reference.current = newValue
 
 1. The value of the reference is persisted (stays the same) between component re-renderings;
 2. Updating a reference doesn’t trigger a component re-rendering.
+
+
+```javascript
+function Demo5() {
+    const sound = useRef();
+    const color = useRef();
+
+    const submit = (e) => {
+        e.preventDefault();
+        const SoundVal = sound.current.value;
+        const ColorVal = color.current.value;
+        alert(`${SoundVal} sounds like ${ColorVal}`);
+        sound.current.value = "";
+        color.current.value = "";
+    }
+    return (
+        <form onSubmit = {submit}> 
+            <input 
+                ref= {sound}
+                type="text" 
+                placeholder="sound"/>
+            <input 
+                ref = {color}
+                type="color" />
+            <button>ADD</button>
+
+        </form>
+    )
+}
+
+```
 
 
 # useContext
@@ -186,3 +302,142 @@ function App() {
 export default App;
 ```
 
+# Create your custom hook
+```javascript
+import {useState, useEffect} from "react";
+
+export function useFetch(uri){
+    const [data,setData] = useState();
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState();
+
+    useEffect(() => {
+        if(!uri) return;
+        fetch(uri)
+            .then((data)=> data.json())
+            .then(setData)
+            .then(()=> setLoading(false))
+            .catch(setError)
+    },[uri]);
+
+    return {loading, data, error};
+
+}
+```
+
+```javascript
+import {useFetch} from "./useFetch"
+function Demo7({login}){
+    const {loading, data, error} = 
+        useFetch(`https://api.github.com/users/${login}`);
+
+    if(loading) return <h1>Loading...</h1>
+    if(error)
+        return(<pre>{JSON.stringify(error,null,2)}</pre>);
+    return (
+<div>
+    <img src={data.avatar_url} alt={data.login} />
+    <div>
+        <h1>{data.login}</h1>
+        {data.name && <p>{data.name}</p>}
+        {data.location && <p>{data.location}</p>}
+
+    </div>
+</div>
+    );
+
+}
+```
+
+```javascript
+<Demo7 login="agnik2019"/>
+```
+
+```javascript
+import {useState} from "react";
+
+export function UserInput(initialValue){
+    const [value, setValue] = useState(initialValue);
+    return [
+        {
+            value, 
+            onChange: (e) => setValue(e.target.value)
+        },
+        ()=> setValue(initialValue)
+    ];
+}
+```
+
+If we dont want to use our own custom hook the code will be like below
+
+```javascript
+import React,{useState} from 'react';
+// controlled component
+
+function Demo6() {
+    const [sound, setSound] = useState();
+    const [color,setColor] = useState();
+
+    const submit = (e) => {
+        e.preventDefault();
+        alert(`${sound} sounds like ${color}`);
+        setSound("");;
+        setColor("#000000");
+    }
+    return (
+        <form onSubmit = {submit}> 
+            <input 
+                value= {sound}
+                type="text" 
+                placeholder="sound"
+                onChange= {(e) => setSound(e.target.value)}/>
+            <input 
+                value = {color}
+                type="color" 
+                onChange= {(e) => setColor(e.target.value)}/>
+                
+            <button>ADD</button>
+
+        </form>
+    )
+}
+
+export default Demo6;
+
+```
+By using custom hook we can increase reusability of code.
+```javascript
+import React from 'react';
+import {UserInput} from "./userInput"
+
+function Demo6() {
+    const [titleProps, resetTitle] = UserInput("");
+    const [colorProps,resetColor] = UserInput("#000000");
+
+    const submit = (e) => {
+        e.preventDefault();
+        alert(`${titleProps.value} sounds like ${colorProps.value}`);
+        resetTitle();
+        resetColor();
+    }
+    return (
+        <form onSubmit = {submit}> 
+            <input 
+               {...titleProps}
+                type="text" 
+                placeholder="sound"
+                />
+            <input 
+            {...colorProps}
+                type="color" 
+                />
+                
+            <button>ADD</button>
+
+        </form>
+    )
+}
+
+export default Demo6;
+
+```
